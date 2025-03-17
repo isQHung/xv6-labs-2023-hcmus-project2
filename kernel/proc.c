@@ -282,12 +282,12 @@ fork(void)
   int i, pid;
   struct proc *np;
   struct proc *p = myproc();
-
+  
   // Allocate process.
   if((np = allocproc()) == 0){
     return -1;
   }
-
+  
   // Copy user memory from parent to child.
   if(uvmcopy(p->pagetable, np->pagetable, p->sz) < 0){
     freeproc(np);
@@ -309,6 +309,10 @@ fork(void)
   np->cwd = idup(p->cwd);
 
   safestrcpy(np->name, p->name, sizeof(p->name));
+
+  // Copy mask for syscall trace
+  np->traced = p->traced;
+  // printf("[DEBUG] fork: parent pid=%d, child pid=%d, trace_mask=%d\n", p->pid, np->pid, np->traced);
 
   pid = np->pid;
 
